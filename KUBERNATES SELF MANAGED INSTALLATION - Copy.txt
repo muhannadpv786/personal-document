@@ -105,15 +105,14 @@ trivy command in jenkins file-----   sh "trivy fs --format table -o trivy-fs-rep
 
 
 
-kubeadm join 172.31.26.5:6443 --token 1ltoqg.5m4p2uqba0qf2tvv \
-        --discovery-token-ca-cert-hash sha256:184bdaa06f861a40a2f6a3c8a9967dba6591bc57ab7044c48479547d9e318744
+join k8s nose...
 
 
 
 
 
 
-k8s tocken -----  eyJhbGciOiJSUzI1NiIsImtpZCI6IlppUU5Kc0R1RlptbWplZjlqemNSM2lfc2cwVEluMmZpSDRRNHlBcTF5TU0ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJhcHBzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im15c2VjcmV0bmFtZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMzg3ZTQwYjQtMmFlMS00NTk0LTk3YWUtMDdhYjRkZDc4OGYwIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OndlYmFwcHM6amVua2lucyJ9.Ds2kIWTTpSa9LZm7IEBdFPKleWgh1JIQa6jxBr9u_39oEFzrtx5Sk41DtiFmH4Z5ySGr5HTa2Y_MggnHOLpipXX5Ri6Ml1R9VCCnJIKQAOx1PS7zEBD8np0CQQCTxDD-jcchVAGXYMtaF9ViUii7rk6GfcmeACJzrSUb2dPnUtF0R0b4X-_ld7y3ngQkKKFH2nvEpMaX_Qu1H507gFXUREZnWhXWU_lxkqWgg4sG6jSnt3rmSrwqvZ6CzO0C8RSAdgDEAV4SEDcDJFlGgVmTT49n6TM2M5KCul5UllUMdxkj1QmKQaymSCuwhyKj_lvah8HuuLKryP2zEn13DWhsvA
+k8s tocken -----  
 
 
 

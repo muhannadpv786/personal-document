@@ -1,0 +1,110 @@
+pipeline {
+    agent any
+    tools{
+        nodejs 'node-22' 
+    }
+    
+    environment{
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('GitCheckout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/muhannadpv786/3-Tier-Full-Stack.git'
+            }
+        }
+        
+        stage('Installing Dependency Packages') {
+            steps {
+             sh "npm install"
+            }
+        }
+        
+        stage('Unit Test') {
+            steps {
+             sh "npm test"
+            }
+        }
+        
+        stage('Trivy Fs Scan') {
+            steps {
+              sh "trivy fs --format table -o fs-report.html ."
+            }
+        }
+        
+        stage('Sonarqube') {
+            steps {
+              withSonarQubeEnv('sonar') {
+
+  
+                
+             sh " $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=campground -Dsonar.projectName=campground "
+                }
+            }   
+            
+    }    
+        
+        stage('Docker build and tag') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t muhannadpv/campa:latest ."
+
+                  }
+                }
+                
+            }
+    }   
+        
+        stage('Trivy Image Scan') {
+            steps {
+                sh "trivy image --format table -o  fs-report.html  muhannadpv/campa:latest" 
+            }
+        }
+        
+        stage('Docker Push Image') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                
+                sh "docker push  muhannadpv/campa:latest"
+                    }
+                }
+                
+            }
+        }
+        
+        stage('Docker Deploy To Dev') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                
+                sh "docker run -d -p 3000:3000 muhannadpv/campa:latest"
+                    }
+                }
+                
+            }
+        }
+        
+         stage('Deploy To Eks') {
+            steps {
+             sh "kubectl apply -f dss.yml"
+             sleep 60
+         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'muhannad-eks', contextName: '', credentialsId: 'docker-cred', namespace: 'webapps', serverUrl: 'https://2C372434A942F45AB91FF48BD21C92C2.gr7.ap-south-1.eks.amazonaws.com']]) {
+         }
+            }
+}
+          stage('Verify The Deployment') {
+            steps {
+            sh "kubectl get pods -n webapps" 
+            sh "kubectl get svc -n webapps"
+             
+         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'muhannad-eks', contextName: '', credentialsId: 'docker-cred', namespace: 'webapps', serverUrl: 'https://2C372434A942F45AB91FF48BD21C92C2.gr7.ap-south-1.eks.amazonaws.com']]) {
+         }
+            }
+}
+        
+        
+    }
+}

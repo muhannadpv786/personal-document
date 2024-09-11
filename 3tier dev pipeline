@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    tools{
+        nodejs 'node-22' 
+    }
+    
+    environment{
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('GitCheckout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/muhannadpv786/3-Tier-Full-Stack.git'
+            }
+        }
+        
+        stage('Installing Dependency Packages') {
+            steps {
+             sh "npm install"
+            }
+        }
+        
+        stage('Unit Test') {
+            steps {
+             sh "npm test"
+            }
+        }
+        
+        stage('Trivy Fs Scan') {
+            steps {
+              sh "trivy fs --format table -o fs-report.html ."
+            }
+        }
+        
+        stage('Sonarqube') {
+            steps {
+              withSonarQubeEnv('sonar') {
+
+  
+                
+             sh " $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=campground -Dsonar.projectName=campground "
+                }
+            }   
+            
+    }    
+        
+        stage('Docker build and tag') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t muhannadpv/campground:latest ."
+
+                  }
+                }
+                
+            }
+    }   
+        
+        stage('Trivy Image Scan') {
+            steps {
+                sh "trivy image --format table -o  fs-report.html  muhannadpv/campground:latest" 
+            }
+        }
+        
+        stage('Docker Push Image') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                
+                sh "docker push  muhannadpv/campground:latest"
+                    }
+                }
+                
+            }
+        }
+        
+        stage('Docker Deploy To Dev') {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                
+                sh "docker run -d -p 3000:3000 muhannadpv/campground:latest"
+                    }
+                }
+                
+            }
+        }
+    }
+}
+ ------------------------------------------------------------------------------------------------------dev server -----pipeline---------------------
